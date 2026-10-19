@@ -62,10 +62,10 @@
 - **Pejling:** Parkér
 
 ### Scanna (også: Scana)
-- **Link:** [scana-valgfagseksamen-main.vercel.app](https://scana-valgfagseksamen-main.vercel.app/)
-- **One-liner:** Prissammenligning (live demo). Detaljer udfyldes stadig sammen.
+- **Link:** [scana-web.vercel.app](https://scana-web.vercel.app/)
+- **One-liner:** Prissammenligning (live site). Detaljer udfyldes stadig sammen.
 - **Problem / løsning:** —
-- **Status:** Ukendt i FACCI (ingen vault/brand pack) — bekræft at demoen er den rigtige.
+- **Status:** Ukendt i FACCI (ingen vault/brand pack).
 - **Content-vinkel:** Ukendt.
 - **Pejling:** Udfyld først
 - **Udfyld mindst:** one-liner, målgruppe, om content er kerne eller support, næste bevis.

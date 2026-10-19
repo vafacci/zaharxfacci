@@ -242,24 +242,24 @@ export const CONCEPTS: PortfolioConcept[] = [
     name: "Scanna",
     aliases: ["Scana"],
     oneLiner:
-      "Prissammenligning (live demo: “Scana – sammenlign priser”). Detaljer udfyldes stadig sammen.",
+      "Prissammenligning — live på scana-web. Detaljer udfyldes stadig sammen.",
     problem: "—",
     solution: "—",
     status: "ukendt",
     statusNote:
-      "Ingen brand pack i FACCI endnu. Live demo fundet under Scana-valgfagsdeploy — bekræft om det er den rigtige “Scanna”.",
+      "Ingen brand pack i FACCI endnu. Live site: scana-web.vercel.app.",
     contentAngle:
       "Ukendt. Få mindst: one-liner, problem, målgruppe og om content er kerne eller support — før I scorer det seriøst.",
     open: [
-      "Bekræft at live-demoen er den rigtige Scanna",
+      "Hvad er Scanna på én sætning?",
       "Hvem er det til?",
       "Er det produkt, service eller content-brand?",
       "Hvad er næste bevis (prototype, landing, pilot)?",
     ],
     links: [
       {
-        label: "Se Scanna-demo",
-        href: "https://scana-valgfagseksamen-main.vercel.app/",
+        label: "Se Scanna",
+        href: "https://scana-web.vercel.app/",
         primary: true,
       },
     ],
