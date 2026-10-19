@@ -1,0 +1,363 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum AgentRole {
+  ceo
+  manager
+  specialist
+}
+
+enum AgentStatus {
+  active
+  disabled
+}
+
+enum ProjectStatus {
+  active
+  paused
+  archived
+}
+
+enum TaskStatus {
+  draft
+  queued
+  planning
+  waiting_approval
+  running
+  verifying
+  completed
+  failed
+  blocked
+  cancelled
+}
+
+enum ApprovalState {
+  pending
+  approved
+  rejected
+  expired
+}
+
+enum ToolState {
+  online
+  offline
+  not_configured
+  not_connected
+  research_only
+  disabled
+}
+
+model Organization {
+  id        String    @id @default(cuid())
+  name      String
+  ownerName String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  projects  Project[]
+  agents    Agent[]
+  memories  OwnerMemory[]
+  budgets   MonthlyBudget[]
+}
+
+/** M6 — owner/CEO-scoped durable preferences (not project-private). */
+model OwnerMemory {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  category       String
+  content        String
+  sourceRef      String?
+  lastVerifiedAt DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId, category])
+}
+
+/**
+ * M6 — monthly resource budgets (org-wide when projectId is empty string).
+ * Counts are observed local usage, not cloud billing invoices.
+ */
+model MonthlyBudget {
+  id                   String       @id @default(cuid())
+  organizationId       String
+  organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  /** Empty string = organization-wide ceiling; else project id. */
+  projectId            String       @default("")
+  monthKey             String
+  maxPlanCalls         Int          @default(200)
+  maxImageGens         Int          @default(40)
+  maxTaskCreates       Int          @default(300)
+  usedPlanCalls        Int          @default(0)
+  usedImageGens        Int          @default(0)
+  usedTaskCreates      Int          @default(0)
+  remoteModelConsent   Boolean      @default(false)
+  remoteModelMaxCalls  Int          @default(0)
+  usedRemoteCalls      Int          @default(0)
+  notes                String?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  @@unique([organizationId, projectId, monthKey])
+  @@index([monthKey])
+}
+
+model Project {
+  id             String           @id @default(cuid())
+  organizationId String
+  organization   Organization     @relation(fields: [organizationId], references: [id])
+  slug           String           @unique
+  name           String
+  mission        String?
+  status         ProjectStatus    @default(active)
+  priority       Int              @default(0)
+  repositoryPath String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  agents         Agent[]
+  goals          ProjectGoal[]
+  tasks          Task[]
+  artifacts      Artifact[]
+  memories       ProjectMemory[]
+  auditEvents    AuditEvent[]
+  schedules      Schedule[]
+
+  @@index([organizationId])
+  @@index([status])
+}
+
+model Agent {
+  id                 String                @id @default(cuid())
+  organizationId     String
+  organization       Organization          @relation(fields: [organizationId], references: [id])
+  projectId          String?
+  project            Project?              @relation(fields: [projectId], references: [id])
+  parentAgentId      String?
+  parentAgent        Agent?                @relation("AgentHierarchy", fields: [parentAgentId], references: [id])
+  children           Agent[]               @relation("AgentHierarchy")
+  name               String
+  role               AgentRole
+  templateKey        String
+  instructions       String?
+  status             AgentStatus           @default(active)
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  assignedTasks      Task[]                @relation("TaskAssignee")
+  steps              TaskStep[]
+  toolPermissions    AgentToolPermission[]
+  requestedApprovals Approval[]            @relation("ApprovalRequester")
+
+  @@index([organizationId])
+  @@index([projectId])
+  @@index([parentAgentId])
+  @@index([role])
+}
+
+model AgentToolPermission {
+  id             String  @id @default(cuid())
+  agentId        String
+  agent          Agent   @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  toolId         String
+  actionPattern  String
+  projectId      String?
+  approvalPolicy String  @default("none")
+
+  @@index([agentId])
+  @@index([toolId])
+}
+
+model ProjectGoal {
+  id              String   @id @default(cuid())
+  projectId       String
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  goal            String
+  successCriteria String?
+  priority        Int      @default(0)
+  ownerStatus     String   @default("active")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([projectId])
+}
+
+model Task {
+  id              String      @id @default(cuid())
+  projectId       String
+  project         Project     @relation(fields: [projectId], references: [id])
+  assignedAgentId String?
+  assignedAgent   Agent?      @relation("TaskAssignee", fields: [assignedAgentId], references: [id])
+  parentTaskId    String?
+  parentTask      Task?       @relation("TaskTree", fields: [parentTaskId], references: [id])
+  childTasks      Task[]      @relation("TaskTree")
+  title           String
+  objective       String
+  status          TaskStatus  @default(draft)
+  /** operational = real work; validation = M1–M3 harness / regression tests */
+  origin          String      @default("operational")
+  priority        Int         @default(0)
+  maxSteps        Int         @default(12)
+  idempotencyKey  String?     @unique
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  completedAt     DateTime?
+  runs            TaskRun[]
+  approvals       Approval[]
+  artifacts       Artifact[]
+
+  @@index([projectId, status])
+  @@index([assignedAgentId])
+  @@index([createdAt])
+  @@index([origin])
+}
+
+model TaskRun {
+  id             String     @id @default(cuid())
+  taskId         String
+  task           Task       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  modelProvider  String?
+  modelId        String?
+  planJson       String?
+  planLatencyMs  Int?
+  attempt        Int        @default(1)
+  status         TaskStatus @default(queued)
+  errorCode      String?
+  errorMessage   String?
+  leaseOwner     String?
+  leaseExpiresAt DateTime?
+  startedAt      DateTime?
+  endedAt        DateTime?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  steps          TaskStep[]
+
+  @@index([taskId])
+  @@index([status, leaseExpiresAt])
+}
+
+model TaskStep {
+  id            String     @id @default(cuid())
+  runId         String
+  run           TaskRun    @relation(fields: [runId], references: [id], onDelete: Cascade)
+  sequence      Int
+  agentId       String?
+  agent         Agent?     @relation(fields: [agentId], references: [id])
+  actionType    String
+  inputSummary  String?
+  outputSummary String?
+  status        TaskStatus @default(queued)
+  evidenceRef   String?
+  startedAt     DateTime?
+  endedAt       DateTime?
+
+  @@unique([runId, sequence])
+  @@index([runId])
+}
+
+model Approval {
+  id                 String        @id @default(cuid())
+  taskId             String
+  task               Task          @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  requestedByAgentId String?
+  requestedByAgent   Agent?        @relation("ApprovalRequester", fields: [requestedByAgentId], references: [id])
+  actionSummary      String
+  actionType         String
+  riskLevel          String
+  payloadJson        String
+  payloadHash        String
+  state              ApprovalState @default(pending)
+  approvedBy         String?
+  expiresAt          DateTime?
+  decidedAt          DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@index([taskId])
+  @@index([state])
+}
+
+model Artifact {
+  id           String   @id @default(cuid())
+  projectId    String
+  project      Project  @relation(fields: [projectId], references: [id])
+  taskId       String?
+  task         Task?    @relation(fields: [taskId], references: [id])
+  kind         String
+  title        String
+  storageRef   String
+  contentHash  String?
+  metadataJson String?
+  createdAt    DateTime @default(now())
+
+  @@index([projectId])
+  @@index([taskId])
+}
+
+model ToolRegistration {
+  id             String    @id @default(cuid())
+  adapterType    String    @unique
+  name           String
+  state          ToolState @default(not_configured)
+  sanitizedConfig String?
+  capabilityJson String?
+  updatedAt      DateTime  @updatedAt
+  createdAt      DateTime  @default(now())
+}
+
+model ProjectMemory {
+  id             String   @id @default(cuid())
+  projectId      String
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  category       String
+  content        String
+  sourceRef      String?
+  visibility     String   @default("project")
+  lastVerifiedAt DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([projectId])
+}
+
+model AuditEvent {
+  id             String   @id @default(cuid())
+  projectId      String?
+  project        Project? @relation(fields: [projectId], references: [id])
+  actor          String
+  verb           String
+  target         String
+  payloadRedacted String?
+  createdAt      DateTime @default(now())
+
+  @@index([projectId, createdAt])
+  @@index([createdAt])
+}
+
+model Schedule {
+  id                    String    @id @default(cuid())
+  projectId             String
+  project               Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title                 String
+  rule                  String
+  enabled               Boolean   @default(false)
+  nextRunAt             DateTime?
+  lastRunAt             DateTime?
+  lastTaskId            String?
+  actionTemplate        String?
+  /** M6: enabling operational recurring work requires owner approval once. */
+  requiresOwnerApproval Boolean   @default(true)
+  ownerApprovedAt       DateTime?
+  maxFiresPerDay        Int       @default(8)
+  firesToday            Int       @default(0)
+  firesDayKey           String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([projectId])
+  @@index([enabled, nextRunAt])
+}

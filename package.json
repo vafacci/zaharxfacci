@@ -1,0 +1,62 @@
+{
+  "name": "facci-agent",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --webpack --hostname 127.0.0.1 --port 3010",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1 --port 3010",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "worker": "tsx worker/index.ts",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:reset": "prisma migrate reset --force",
+    "db:backup": "tsx -e \"import { createSqliteBackup } from './src/lib/backup.ts'; console.log(JSON.stringify(createSqliteBackup('cli'), null, 2))\"",
+    "m5:regression": "tsx scripts/m5-regression.ts",
+    "windows:tasks": "powershell -ExecutionPolicy Bypass -File ./scripts/install-windows-tasks.ps1 -Status",
+    "windows:tasks:install": "powershell -ExecutionPolicy Bypass -File ./scripts/install-windows-tasks.ps1 -Install",
+    "m5:acceptance": "tsx scripts/m5-acceptance.ts",
+    "m6:acceptance": "tsx scripts/m6-acceptance.ts",
+    "autiq:loop:seed": "tsx scripts/seed-autiq-weekly-loop.ts",
+    "project:loops:seed": "tsx scripts/seed-project-loops.ts",
+    "team:ensure": "tsx scripts/ensure-seed-teams.ts",
+    "autiq:brand:import": "tsx scripts/import-chatgpt-brand.ts",
+    "facci:runtime": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/facci-runtime.ps1",
+    "facci:game-on": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/facci-runtime.ps1 -Action GameOn",
+    "facci:game-off": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/facci-runtime.ps1 -Action GameOff",
+    "facci:status": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/facci-runtime.ps1 -Action Status",
+    "postinstall": "prisma generate"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "6.19.0",
+    "next": "^16.4.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "uuid": "^14.0.3",
+    "zod": "^4.6.6"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@next/eslint-plugin-next": "^16.4.0",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@typescript-eslint/eslint-plugin": "^8.71.1",
+    "@typescript-eslint/parser": "^8.71.1",
+    "eslint": "^9",
+    "eslint-config-next": "^16.4.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "opencode-ai": "^1.19.0",
+    "prisma": "6.19.0",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^3.2.4"
+  }
+}

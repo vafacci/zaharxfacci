@@ -1,0 +1,7 @@
+{
+  "enabled": false,
+  "provider": "openai-compatible",
+  "baseUrl": null,
+  "modelId": null,
+  "notes": "M6 opt-in remote models. Set enabled=true only with owner consent, configure FACCI_REMOTE_MODEL_* env vars, and grant remoteModelConsent on MonthlyBudget. Default remains local Ollama."
+}

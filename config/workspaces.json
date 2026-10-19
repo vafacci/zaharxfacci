@@ -1,0 +1,183 @@
+{
+  "workspaces": [
+    {
+      "id": "toy-counter",
+      "label": "FACCI Toy Counter",
+      "relativePath": "workspaces/toy-counter",
+      "allowedGlobs": ["src/**", "test/**", "package.json", "README.md"],
+      "deniedGlobs": [".env", "**/.env*", "**/*.pem", "**/*.key"],
+      "testCommand": ["node", "--test", "test/counter.test.js"],
+      "enabled": true
+    },
+    {
+      "id": "autiq",
+      "label": "AUTIQ brand content",
+      "projectSlug": "autiq",
+      "relativePath": "workspaces/autiq",
+      "allowedGlobs": [
+        "README.md",
+        "check.js",
+        "brand/**",
+        "content/**"
+      ],
+      "deniedGlobs": [".env", "**/.env*", "**/*.pem", "**/*.key", "secrets/**"],
+      "testCommand": ["node", "check.js"],
+      "enabled": true
+    },
+    {
+      "id": "autiq-web",
+      "label": "AUTIQ website (Desktop/AUTIQ-main)",
+      "projectSlug": "autiq",
+      "absolutePath": "C:\\Users\\Dayan\\Desktop\\AUTIQ-main",
+      "allowedGlobs": [
+        "app/**",
+        "components/**",
+        "lib/**",
+        "styles/**",
+        "docs/**",
+        "README.md",
+        "AGENTS.md",
+        "facci-ok.js"
+      ],
+      "deniedGlobs": [
+        ".env",
+        ".env.*",
+        "**/.env*",
+        "**/*.pem",
+        "**/*.key",
+        "node_modules/**",
+        ".next/**",
+        "data/**"
+      ],
+      "testCommand": ["node", "docs/facci-ok.js"],
+      "enabled": true
+    },
+    {
+      "id": "grupvi",
+      "label": "Grupvi / StudieChat product vault",
+      "projectSlug": "grupvi",
+      "relativePath": "workspaces/grupvi",
+      "allowedGlobs": ["README.md", "check.js", "product/**", "research/**", "brand/**"],
+      "deniedGlobs": [".env", "**/.env*", "**/*.pem", "**/*.key", "secrets/**"],
+      "testCommand": ["node", "check.js"],
+      "enabled": true
+    },
+    {
+      "id": "grupvi-app",
+      "label": "StudieChat / Grupvi app (Desktop/KARRIERE/studiechat)",
+      "projectSlug": "grupvi",
+      "absolutePath": "C:\\Users\\Dayan\\Desktop\\KARRIERE\\studiechat",
+      "allowedGlobs": [
+        "app/**",
+        "src/**",
+        "website/**",
+        "public/**",
+        "scripts/**",
+        "AGENTS.md",
+        "APP_STORE.md",
+        "BETA_TEST.md",
+        "CLOUD.md",
+        "facci-ok.js"
+      ],
+      "deniedGlobs": [
+        ".env",
+        ".env.*",
+        "**/.env*",
+        "**/*.pem",
+        "**/*.key",
+        "node_modules/**",
+        ".expo/**",
+        "dist-app/**",
+        "supabase/**"
+      ],
+      "testCommand": ["node", "facci-ok.js"],
+      "enabled": true
+    },
+    {
+      "id": "dreamit",
+      "label": "DREAMit product vault",
+      "projectSlug": "dreamit",
+      "relativePath": "workspaces/dreamit",
+      "allowedGlobs": ["README.md", "check.js", "product/**", "research/**", "brand/**"],
+      "deniedGlobs": [".env", "**/.env*", "**/*.pem", "**/*.key", "secrets/**"],
+      "testCommand": ["node", "check.js"],
+      "enabled": true
+    },
+    {
+      "id": "dreamit-web",
+      "label": "DreamIT website (Desktop/DreamIT)",
+      "projectSlug": "dreamit",
+      "absolutePath": "C:\\Users\\Dayan\\Desktop\\DreamIT",
+      "allowedGlobs": [
+        "src/**",
+        "public/**",
+        "README.md",
+        "AGENTS.md",
+        "facci-ok.js"
+      ],
+      "deniedGlobs": [
+        ".env",
+        ".env.*",
+        "**/.env*",
+        "**/*.pem",
+        "**/*.key",
+        "node_modules/**",
+        ".next/**",
+        "out/**"
+      ],
+      "testCommand": ["node", "facci-ok.js"],
+      "enabled": true
+    },
+    {
+      "id": "nofacci",
+      "label": "NOFACCI agency vault",
+      "projectSlug": "nofacci",
+      "relativePath": "workspaces/nofacci",
+      "allowedGlobs": [
+        "README.md",
+        "check.js",
+        "brand/**",
+        "product/**",
+        "content/**",
+        "research/**"
+      ],
+      "deniedGlobs": [".env", "**/.env*", "**/*.pem", "**/*.key", "secrets/**"],
+      "testCommand": ["node", "check.js"],
+      "enabled": true
+    },
+    {
+      "id": "nofacci-web",
+      "label": "NOFACCI agency website",
+      "projectSlug": "nofacci",
+      "relativePath": "workspaces/nofacci-web",
+      "allowedGlobs": [
+        "README.md",
+        "check.js",
+        "index.html",
+        "styles.css",
+        "src/**",
+        "public/**",
+        "inspiration/**"
+      ],
+      "deniedGlobs": [".env", "**/.env*", "**/*.pem", "**/*.key", "secrets/**", "node_modules/**"],
+      "testCommand": ["node", "check.js"],
+      "enabled": true
+    },
+    {
+      "id": "dailycap",
+      "label": "DailyCap product vault",
+      "projectSlug": "dailycap",
+      "relativePath": "workspaces/dailycap",
+      "allowedGlobs": [
+        "README.md",
+        "check.js",
+        "brand/**",
+        "product/**",
+        "research/**"
+      ],
+      "deniedGlobs": [".env", "**/.env*", "**/*.pem", "**/*.key", "secrets/**"],
+      "testCommand": ["node", "check.js"],
+      "enabled": true
+    }
+  ]
+}

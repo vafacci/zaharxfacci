@@ -1,0 +1,19 @@
+---
+description: "FACCI architecture, agent hierarchy, implementation quality and approval boundaries"
+alwaysApply: true
+---
+# FACCI: always-on engineering contract
+
+FACCI is an AI-organization operating system, NOT a single agent chatbot.
+
+**Hierarchy: Human owner > FACCI CEO Agent > independent project manager agents (AUTIQ, StudieChat/Grupvi, DreamIT, etc.) > project-local specialist agents (social, image, developer, marketing, QA, security, research, optimization, etc.).**
+
+Projects have isolated memory/context/permissions/workspaces. Shared underlying LLM models and shared tools do NOT erase those boundaries. The Image Studio is a reusable tool, not a business-level manager agent.
+
+Read `README.md`, `AGENTS.md` and relevant docs before modifying architecture. `docs/01_PRODUCT_VISION.md` and `docs/05_SECURITY_AND_APPROVALS.md` are authoritative for intent and policy. Track progress in `docs/IMPLEMENTATION_STATUS.md`.
+
+Build local-first for Windows RTX 2060 6GB, 16GB RAM. Use small verifiable increments, a durable task engine, explicit plan schemas, project-scoped agent teams, action approval gates, safe tool adapters and honest status. A separate worker is required for long-running tasks. Never mistake a mocked demo for live agent capability.
+
+Never edit another project or run external actions without authorization. Never install large models, expose secrets, publish posts, send messages, purchase services or perform destructive system actions without explicit human approval.
+
+Do not overbuild: Milestone 1 is a working FACCI hierarchy/dashboard with persistence and a task demonstration. Model/tool integration is introduced incrementally with tests. Prefer actual output over speculative scaffolding.

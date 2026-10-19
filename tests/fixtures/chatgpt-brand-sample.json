@@ -1,0 +1,57 @@
+[
+  {
+    "title": "AUTIQ brand workshop",
+    "mapping": {
+      "n1": {
+        "message": {
+          "author": { "role": "user" },
+          "content": {
+            "parts": [
+              "Positioning: We are not a set-and-forget spam bot. First offer is Content Autopilot with human approval."
+            ]
+          }
+        }
+      },
+      "n2": {
+        "message": {
+          "author": { "role": "user" },
+          "content": {
+            "parts": [
+              "Audience: creator operators who hate blank-page caption work. Pain point: rewriting the same idea for Instagram LinkedIn Facebook."
+            ]
+          }
+        }
+      },
+      "n3": {
+        "message": {
+          "author": { "role": "user" },
+          "content": {
+            "parts": [
+              "Claims: Do not invent testimonials. Never invent metrics. Forbidden: revolutionary game-changer guarantees."
+            ]
+          }
+        }
+      },
+      "n4": {
+        "message": {
+          "author": { "role": "user" },
+          "content": {
+            "parts": [
+              "Example Instagram caption: Draft once, review, then decide — nothing posts without you."
+            ]
+          }
+        }
+      },
+      "n5": {
+        "message": {
+          "author": { "role": "assistant" },
+          "content": {
+            "parts": [
+              "Sure! Here is a fluffy paragraph with api_key=sk-abcdefghijklmnopqrstuvwxyz123456 that should be redacted."
+            ]
+          }
+        }
+      }
+    }
+  }
+]

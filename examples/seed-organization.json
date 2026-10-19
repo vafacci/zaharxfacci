@@ -1,0 +1,33 @@
+{
+  "organization": "FACCI",
+  "owner": "Human Owner",
+  "ceo": { "name": "FACCI CEO", "role": "ceo", "projectId": null },
+  "projectSeeds": [
+    {
+      "name": "AUTIQ",
+      "slug": "autiq",
+      "manager": "AUTIQ Manager",
+      "team": ["social", "image", "developer", "marketing", "automation", "analytics", "security-qa"]
+    },
+    {
+      "name": "StudieChat / Grupvi",
+      "slug": "grupvi",
+      "manager": "Grupvi Manager",
+      "team": ["developer", "ux-design", "qa", "research"]
+    },
+    {
+      "name": "DreamIT",
+      "slug": "dreamit",
+      "manager": "DreamIT Manager",
+      "team": ["developer", "design", "marketing", "research"]
+    }
+  ],
+  "tools": [
+    { "id": "ollama", "status": "not_configured" },
+    { "id": "image-studio", "status": "not_connected" },
+    { "id": "postiz", "status": "not_connected" },
+    { "id": "n8n", "status": "not_connected" },
+    { "id": "opencode", "status": "not_connected" },
+    { "id": "rea", "status": "research_only" }
+  ]
+}

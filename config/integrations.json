@@ -1,0 +1,34 @@
+{
+  "imageStudio": {
+    "baseUrl": "http://127.0.0.1:3000",
+    "executeByDefault": true,
+    "defaultMode": "txt2img",
+    "defaultWorkflowKey": "txt2img",
+    "pollIntervalMs": 2500,
+    "pollTimeoutMs": 300000,
+    "defaultSettings": {
+      "width": 512,
+      "height": 512,
+      "steps": 16,
+      "cfg": 6,
+      "seed": -1,
+      "batchCount": 1,
+      "samplerName": "dpmpp_2m",
+      "scheduler": "karras",
+      "denoise": 1,
+      "identityStrength": 0.75,
+      "referencePriority": "balanced"
+    }
+  },
+  "postiz": {
+    "baseUrl": "",
+    "apiKeyEnv": "POSTIZ_API_KEY",
+    "integrationIdEnv": "POSTIZ_INTEGRATION_ID",
+    "draftsOnly": true
+  },
+  "n8n": {
+    "baseUrl": "http://127.0.0.1:5678",
+    "apiKeyEnv": "N8N_API_KEY",
+    "allowLiveExecution": false
+  }
+}
