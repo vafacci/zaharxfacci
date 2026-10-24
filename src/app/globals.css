@@ -1,4 +1,4 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 
 /* FACCI: crystal-first (emerald facets) + subtle mystic violet undertone */
 :root {
@@ -2187,235 +2187,6 @@ select {
   font-weight: 650;
 }
 
-/* Aftale */
-.pc-hero {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1.25rem;
-  margin-bottom: 1.5rem;
-}
-
-.pc-hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.pc-highlights {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-  gap: 0.9rem;
-  margin: 0 0 2rem;
-  padding: 0;
-  list-style: none;
-}
-
-.pc-highlights li {
-  display: grid;
-  gap: 0.2rem;
-  padding: 1.1rem 1.25rem;
-  border: 1px solid var(--p-line);
-  border-radius: 20px;
-  background: var(--p-card);
-}
-
-.pc-highlight-value {
-  font-size: 1.35rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--p-accent);
-}
-
-.pc-highlight-label {
-  font-size: 0.82rem;
-  color: var(--p-dim);
-}
-
-.pc-layout {
-  display: grid;
-  grid-template-columns: 15rem minmax(0, 1fr);
-  gap: 2rem;
-  align-items: start;
-}
-
-.pc-toc {
-  position: sticky;
-  top: 5rem;
-  padding: 1.1rem 1rem;
-  border: 1px solid var(--p-line);
-  border-radius: 20px;
-  background: var(--p-card);
-}
-
-.pc-toc-title {
-  margin: 0 0 0.6rem;
-  font-size: 0.78rem;
-  font-weight: 650;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--p-dim);
-}
-
-.pc-toc ol {
-  display: grid;
-  gap: 0.1rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.pc-toc a {
-  display: flex;
-  gap: 0.6rem;
-  padding: 0.4rem 0.5rem;
-  border-radius: 10px;
-  font-size: 0.9rem;
-  color: var(--p-muted);
-  text-decoration: none;
-}
-
-.pc-toc a:hover {
-  background: var(--p-bg);
-  color: var(--p-ink);
-}
-
-.pc-toc a span {
-  min-width: 1.2rem;
-  color: var(--p-accent);
-  font-weight: 650;
-  font-variant-numeric: tabular-nums;
-}
-
-.pc-body {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(26rem, 1fr));
-  gap: 1rem;
-  align-items: start;
-}
-
-.pc-body > .partner-callout,
-.pc-section.wide {
-  grid-column: 1 / -1;
-}
-
-.pc-section {
-  padding: 1.5rem 1.6rem;
-  border: 1px solid var(--p-line);
-  border-radius: 22px;
-  background: var(--p-card);
-  scroll-margin-top: 5rem;
-}
-
-.pc-section h2 {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 0 0 0.9rem;
-  font-size: 1.2rem;
-  font-weight: 650;
-  letter-spacing: -0.02em;
-}
-
-.pc-num {
-  display: grid;
-  place-items: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 999px;
-  background: var(--p-accent-soft);
-  color: var(--p-accent);
-  font-size: 0.9rem;
-  font-variant-numeric: tabular-nums;
-}
-
-.pc-section p {
-  margin: 0 0 0.8rem;
-  line-height: 1.6;
-  color: var(--p-muted);
-}
-
-.pc-section p:last-child {
-  margin-bottom: 0;
-}
-
-.pc-bullets {
-  display: grid;
-  gap: 0.55rem;
-  margin: 0 0 0.8rem;
-  padding-left: 1.2rem;
-  list-style: disc;
-  line-height: 1.55;
-  color: var(--p-muted);
-}
-
-.pc-bullets li::marker {
-  color: var(--p-accent);
-}
-
-.pc-items {
-  display: grid;
-  gap: 0.55rem;
-  margin: 0 0 0.9rem;
-}
-
-.pc-items > div {
-  display: grid;
-  grid-template-columns: minmax(10rem, 15rem) 1fr;
-  gap: 0.25rem 1rem;
-  padding: 0.7rem 0.9rem;
-  border-radius: 14px;
-  background: var(--p-bg);
-}
-
-.pc-items dt {
-  font-weight: 600;
-  color: var(--p-ink);
-}
-
-.pc-items dd {
-  margin: 0;
-  color: var(--p-muted);
-  line-height: 1.5;
-}
-
-.pc-sign {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  margin-top: 1.6rem;
-}
-
-.pc-sign-line {
-  display: block;
-  height: 2.6rem;
-  border-bottom: 1px solid var(--p-ink);
-}
-
-.pc-sign p {
-  margin: 0.45rem 0 0.1rem;
-  font-weight: 600;
-  color: var(--p-ink);
-}
-
-.pc-sign small {
-  color: var(--p-dim);
-}
-
-@media (max-width: 62rem) {
-  .pc-layout {
-    grid-template-columns: 1fr;
-  }
-  .pc-toc {
-    position: static;
-  }
-  .pc-toc ol {
-    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-  }
-}
-
 @media (max-width: 40rem) {
   .partner-nav-inner {
     padding: 0.6rem 0.9rem;
@@ -2449,10 +2220,118 @@ select {
   .pr-seg button {
     height: 2.4rem;
   }
-  .pc-items > div {
-    grid-template-columns: 1fr;
+}
+
+/* Aftale — helt almindeligt dokument */
+.doc {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 2.5rem 2.25rem 3rem;
+  border: 1px solid var(--p-line);
+  border-radius: 16px;
+  background: #fff;
+  color: #1c2420;
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+
+.doc h1 {
+  margin: 0;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.doc .doc-subtitle {
+  margin: 0.15rem 0 1.25rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--p-muted);
+}
+
+.doc-tag {
+  display: inline-block;
+  margin: 0 0 0.6rem;
+  padding: 0.1rem 0.6rem;
+  border: 1px solid var(--p-line);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--p-dim);
+}
+
+.doc-head {
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--p-line);
+}
+
+.doc-head p {
+  margin: 0 0 0.6rem;
+}
+
+.doc-links a {
+  color: var(--p-accent);
+  text-decoration: underline;
+}
+
+.doc h3 {
+  margin: 1.9rem 0 0.5rem;
+  font-size: 1.12rem;
+  font-weight: 650;
+}
+
+.doc p {
+  margin: 0 0 0.8rem;
+}
+
+.doc ul {
+  margin: 0 0 0.9rem;
+  padding-left: 1.4rem;
+  list-style: disc;
+}
+
+.doc li {
+  margin-bottom: 0.35rem;
+}
+
+.doc-sign {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  margin-top: 2.2rem;
+}
+
+.doc-sign span {
+  display: block;
+  height: 2.4rem;
+  border-bottom: 1px solid #1c2420;
+}
+
+.doc-sign p {
+  margin: 0.4rem 0 0.1rem;
+  font-weight: 600;
+}
+
+.doc-sign small {
+  color: var(--p-dim);
+}
+
+.doc-note {
+  margin-top: 2.2rem !important;
+  padding-top: 1rem;
+  border-top: 1px solid var(--p-line);
+  font-size: 0.9rem;
+  color: var(--p-muted);
+}
+
+@media (max-width: 40rem) {
+  .doc {
+    padding: 1.5rem 1.15rem 2rem;
   }
-  .pc-sign {
+  .doc-sign {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 }

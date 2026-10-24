@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import {
-  CONTRACT_HIGHLIGHTS,
   CONTRACT_META,
   CONTRACT_PDF_HREF,
   CONTRACT_SECTIONS,
@@ -14,114 +13,79 @@ export const metadata: Metadata = {
 
 export default function ContractPage() {
   return (
-    <div className="partner-page partner-wide">
-      <header className="pc-hero">
-        <div>
-          <p className="partner-kicker">Vores aftale</p>
-          <h1 className="partner-title">{CONTRACT_META.title}</h1>
-          <p className="partner-lead">
-            Parter: {CONTRACT_META.parties}. Ikrafttræden: {CONTRACT_META.effective}.
+    <div className="partner-page">
+      <article className="doc">
+        <header className="doc-head">
+          <p className="doc-tag">{CONTRACT_META.status}</p>
+          <h1>FACCI × ZAHAR</h1>
+          <h2 className="doc-subtitle">{CONTRACT_META.title}</h2>
+          <p>
+            <strong>Parter:</strong> {CONTRACT_META.parties}
+            <br />
+            <strong>Ikrafttræden:</strong> {CONTRACT_META.effective}
           </p>
-        </div>
-        <div className="pc-hero-actions">
-          <span className="partner-pill early">{CONTRACT_META.status}</span>
-          <a
-            className="partner-btn solid"
-            href={CONTRACT_PDF_HREF}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Åbn PDF
-          </a>
-          <a className="partner-btn ghost" href={CONTRACT_PDF_HREF} download>
-            Download
-          </a>
-        </div>
-      </header>
+          <p className="doc-links">
+            <a href={CONTRACT_PDF_HREF} target="_blank" rel="noopener noreferrer">
+              Åbn PDF
+            </a>
+            <span aria-hidden> · </span>
+            <a href={CONTRACT_PDF_HREF} download>
+              Download PDF
+            </a>
+          </p>
+        </header>
 
-      <ul className="pc-highlights">
-        {CONTRACT_HIGHLIGHTS.map((h) => (
-          <li key={h.label}>
-            <span className="pc-highlight-value">{h.value}</span>
-            <span className="pc-highlight-label">{h.label}</span>
-          </li>
-        ))}
-      </ul>
+        {CONTRACT_SECTIONS.map((s) => (
+          <section key={s.id} id={s.id}>
+            <h3>
+              {s.number}. {s.title}
+            </h3>
 
-      <div className="pc-layout">
-        <aside className="pc-toc" aria-label="Indhold">
-          <p className="pc-toc-title">Indhold</p>
-          <ol>
-            {CONTRACT_SECTIONS.map((s) => (
-              <li key={s.id}>
-                <a href={`#${s.id}`}>
-                  <span>{s.number}</span>
-                  {s.title}
-                </a>
-              </li>
+            {s.paragraphs?.map((p) => (
+              <p key={p}>{p}</p>
             ))}
-          </ol>
-        </aside>
 
-        <article className="pc-body">
-          {CONTRACT_SECTIONS.map((s) => (
-            <section
-              key={s.id}
-              id={s.id}
-              className={`pc-section${s.id === "underskrifter" ? " wide" : ""}`}
-            >
-              <h2>
-                <span className="pc-num">{s.number}</span>
-                {s.title}
-              </h2>
+            {s.items ? (
+              <ul>
+                {s.items.map((it) => (
+                  <li key={it.label}>
+                    <strong>{it.label}:</strong> {it.value}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
 
-              {s.paragraphs?.map((p) => (
-                <p key={p}>{p}</p>
-              ))}
+            {s.bullets ? (
+              <ul>
+                {s.bullets.map((b) => (
+                  <li key={b}>{b}</li>
+                ))}
+              </ul>
+            ) : null}
 
-              {s.items ? (
-                <dl className="pc-items">
-                  {s.items.map((it) => (
-                    <div key={it.label}>
-                      <dt>{it.label}</dt>
-                      <dd>{it.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              ) : null}
+            {s.after?.map((p) => (
+              <p key={p}>{p}</p>
+            ))}
 
-              {s.bullets ? (
-                <ul className="pc-bullets">
-                  {s.bullets.map((b) => (
-                    <li key={b}>{b}</li>
-                  ))}
-                </ul>
-              ) : null}
-
-              {s.after?.map((p) => (
-                <p key={p}>{p}</p>
-              ))}
-
-              {s.id === "underskrifter" ? (
-                <div className="pc-sign">
-                  <div>
-                    <span className="pc-sign-line" />
-                    <p>Dayan Vafai</p>
-                    <small>Dato: ____________</small>
-                  </div>
-                  <div>
-                    <span className="pc-sign-line" />
-                    <p>Zahar [fulde navn]</p>
-                    <small>Dato: ____________</small>
-                  </div>
+            {s.id === "underskrifter" ? (
+              <div className="doc-sign">
+                <div>
+                  <span />
+                  <p>Dayan Vafai</p>
+                  <small>Dato: ____________</small>
                 </div>
-              ) : null}
-            </section>
-          ))}
+                <div>
+                  <span />
+                  <p>Zahar [fulde navn]</p>
+                  <small>Dato: ____________</small>
+                </div>
+              </div>
+            ) : null}
+          </section>
+        ))}
 
-          <p className="partner-callout soft">{CONTRACT_META.note}</p>
-        </article>
-      </div>
+        <p className="doc-note">{CONTRACT_META.note}</p>
+      </article>
     </div>
   );
 }
