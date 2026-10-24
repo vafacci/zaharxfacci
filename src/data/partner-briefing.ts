@@ -35,8 +35,8 @@ export const SCORE_CRITERIA: {
   },
   {
     key: "content",
-    label: "Nem + billig content",
-    hint: "5 = let og næsten gratis at lave",
+    label: "Markedsføring",
+    hint: "5 = nem og billig at markedsføre",
   },
   {
     key: "impact",
