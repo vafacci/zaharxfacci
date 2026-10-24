@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { PartnerVersions } from "@/components/partner/PartnerVersions";
 import {
   RESULT_CRITERIA,
   RESULT_MAX,
@@ -103,6 +104,8 @@ export default function ResultPage() {
           </article>
         ))}
       </section>
+
+      <PartnerVersions />
     </div>
   );
 }

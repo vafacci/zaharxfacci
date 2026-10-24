@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   CONCEPTS,
   SCORE_CRITERIA,
@@ -11,15 +11,17 @@ import {
   totalFor,
   type ScoreKey,
 } from "@/data/partner-briefing";
+import {
+  GENERAL_NOTE_ID,
+  NOTE_MAX_LENGTH,
+  VERSIONS_CHANGED_EVENT,
+  noteKey,
+  scoreKey,
+} from "@/lib/partner-shared";
+import { PartnerVersions } from "./PartnerVersions";
+import { usePartnerState, type SaveStatus } from "./usePartnerState";
 
-// Samme nøgler som før, så allerede givne point og noter bevares.
-const STORAGE_KEY = "facci-partner-scores-v3";
-const NOTES_KEY = "facci-partner-notes-v1";
 const SCORE_VALUES = Array.from({ length: SCORE_MAX_POINTS }, (_, i) => i + 1);
-
-type ScoreMap = Record<string, Record<ScoreKey, number>>;
-/** Noter pr. idé (id) + "_general" til fælles noter. */
-type NotesMap = Record<string, string>;
 
 function statusLabel(status: string): string {
   switch (status) {
@@ -47,31 +49,32 @@ function statusClass(status: string): string {
   }
 }
 
-export function PartnerRankingView() {
-  const [scores, setScores] = useState<ScoreMap>(emptyScores);
-  const [notes, setNotes] = useState<NotesMap>({});
-  const [hydrated, setHydrated] = useState(false);
-  const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setScores({ ...emptyScores(), ...(JSON.parse(raw) as ScoreMap) });
-      const rawNotes = localStorage.getItem(NOTES_KEY);
-      if (rawNotes) setNotes(JSON.parse(rawNotes) as NotesMap);
-    } catch {
-      /* ignore corrupt storage */
+function saveLabel(status: SaveStatus, savedAt: Date | null): string {
+  switch (status) {
+    case "loading":
+      return "Henter…";
+    case "saving":
+      return "Gemmer…";
+    case "error":
+      return "Kunne ikke gemme – prøver igen";
+    case "unavailable":
+      return "Gemning er ikke sat op";
+    default: {
+      if (!savedAt) return "Alt er gemt";
+      const time = new Intl.DateTimeFormat("da-DK", {
+        timeZone: "Europe/Copenhagen",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(savedAt);
+      return `Gemt kl. ${time}`;
     }
-    setHydrated(true);
-  }, []);
+  }
+}
 
-  useEffect(() => {
-    if (hydrated) localStorage.setItem(STORAGE_KEY, JSON.stringify(scores));
-  }, [scores, hydrated]);
-
-  useEffect(() => {
-    if (hydrated) localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
-  }, [notes, hydrated]);
+export function PartnerRankingView() {
+  const { data, status, savedAt, ready, edit, flushNow } = usePartnerState();
+  const { scores, notes } = data;
+  const [copied, setCopied] = useState(false);
 
   const ceiling = maxTotal();
 
@@ -86,31 +89,47 @@ export function PartnerRankingView() {
           filled: SCORE_CRITERIA.every((k) => (s[k.key] ?? 0) > 0),
         };
       }).sort((a, b) => b.total - a.total),
-    [scores, ceiling],
+    [scores],
   );
 
   const anyScored = ranking.some((r) => r.total > 0);
   const scoredCount = ranking.filter((r) => r.filled).length;
 
   function setScore(conceptId: string, key: ScoreKey, value: number) {
-    setScores((prev) => ({
-      ...prev,
-      [conceptId]: {
-        ...(prev[conceptId] ?? emptyScores()[conceptId]),
-        // Tryk på samme tal igen fjerner pointet
-        [key]: prev[conceptId]?.[key] === value ? 0 : value,
-      },
-    }));
+    const current = scores[conceptId]?.[key] ?? 0;
+    // Tryk på samme tal igen fjerner pointet
+    edit(scoreKey(conceptId, key), String(current === value ? 0 : value), "score");
   }
 
   function setNote(id: string, value: string) {
-    setNotes((prev) => ({ ...prev, [id]: value }));
+    edit(noteKey(id), value.slice(0, NOTE_MAX_LENGTH), "note");
   }
 
-  function resetAll() {
-    if (!window.confirm("Nulstil alle point? Noter bliver stående.")) return;
-    setScores(emptyScores());
-    localStorage.removeItem(STORAGE_KEY);
+  async function resetAll() {
+    if (
+      !window.confirm(
+        "Nulstil alle point? Noter bliver stående. Nuværende stilling gemmes først som en version, så du kan gendanne den.",
+      )
+    ) {
+      return;
+    }
+    try {
+      await flushNow();
+      await fetch("/api/partner/versions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ label: "Før nulstilling af point", kind: "auto" }),
+      });
+      window.dispatchEvent(new Event(VERSIONS_CHANGED_EVENT));
+    } catch {
+      /* hvis versionen ikke kunne gemmes, nulstiller vi ikke */
+      return;
+    }
+    for (const c of CONCEPTS) {
+      for (const k of SCORE_CRITERIA) {
+        if ((scores[c.id]?.[k.key] ?? 0) !== 0) edit(scoreKey(c.id, k.key), "0", "score");
+      }
+    }
   }
 
   async function copyResult() {
@@ -118,7 +137,7 @@ export function PartnerRankingView() {
       (r, i) =>
         `${i + 1}. ${r.name} — ${r.total}/${ceiling}${notes[r.id]?.trim() ? ` — ${notes[r.id].trim()}` : ""}`,
     );
-    const general = notes._general?.trim();
+    const general = notes[GENERAL_NOTE_ID]?.trim();
     const text = `${lines.join("\n")}${general ? `\n\nNoter:\n${general}` : ""}`;
     try {
       await navigator.clipboard.writeText(text);
@@ -137,7 +156,12 @@ export function PartnerRankingView() {
           <h1 className="partner-title">Rangering</h1>
           <p className="partner-lead">
             Giv hver idé 1–{SCORE_MAX_POINTS} point på fem ting. {SCORE_MAX_POINTS} er godt, 1 er
-            dårligt. Rækkefølgen opdaterer sig selv.
+            dårligt. Rækkefølgen opdaterer sig selv, og alt gemmes automatisk, så I begge ser det
+            samme.
+          </p>
+          <p className={`pr-status ${status}`} role="status" aria-live="polite">
+            <span className="pr-status-dot" aria-hidden />
+            {saveLabel(status, savedAt)}
           </p>
         </div>
         <div className="pr-head-actions">
@@ -147,7 +171,7 @@ export function PartnerRankingView() {
           <button type="button" className="partner-btn solid" onClick={copyResult} disabled={!anyScored}>
             {copied ? "Kopieret" : "Kopiér resultat"}
           </button>
-          <button type="button" className="partner-btn ghost" onClick={resetAll}>
+          <button type="button" className="partner-btn ghost" onClick={resetAll} disabled={!ready}>
             Nulstil point
           </button>
         </div>
@@ -228,6 +252,7 @@ export function PartnerRankingView() {
                             type="button"
                             className={val === n ? "active" : val > 0 && n < val ? "under" : undefined}
                             onClick={() => setScore(c.id, crit.key, n)}
+                            disabled={!ready}
                             aria-pressed={val === n}
                           >
                             {n}
@@ -248,6 +273,7 @@ export function PartnerRankingView() {
                 rows={3}
                 value={notes[c.id] ?? ""}
                 onChange={(e) => setNote(c.id, e.target.value)}
+                readOnly={!ready}
                 placeholder={`Tanker om ${c.name}…`}
               />
             </article>
@@ -260,15 +286,20 @@ export function PartnerRankingView() {
         <textarea
           className="partner-note wide"
           rows={6}
-          value={notes._general ?? ""}
-          onChange={(e) => setNote("_general", e.target.value)}
+          value={notes[GENERAL_NOTE_ID] ?? ""}
+          onChange={(e) => setNote(GENERAL_NOTE_ID, e.target.value)}
+          readOnly={!ready}
           placeholder="Beslutninger, næste skridt, tanker fra mødet…"
           aria-label="Fælles noter"
         />
         <p className="partner-hint">
-          Point og noter gemmes kun i denne browser. Brug “Kopiér resultat”, hvis I vil dele dem.
+          Alt gemmes automatisk og deles mellem jer. Skriver I i samme felt samtidig, vinder den
+          sidste ændring – brug “Gem version” herunder, når I vil kunne vende tilbage til en
+          bestemt stilling.
         </p>
       </section>
+
+      <PartnerVersions />
     </div>
   );
 }
