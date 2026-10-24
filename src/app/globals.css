@@ -1757,3 +1757,33 @@ select {
   font-size: 0.88rem;
   color: var(--p-dim);
 }
+
+.partner-note {
+  width: 100%;
+  min-width: 7.5rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 10px;
+  border: 1px solid var(--p-line);
+  background: var(--p-bg);
+  color: var(--p-ink);
+  font: inherit;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+.partner-note.wide {
+  margin-bottom: 0.75rem;
+}
+
+.partner-note:focus {
+  outline: 2px solid rgba(47, 111, 94, 0.35);
+  border-color: transparent;
+}
+
+.partner-note-label {
+  display: block;
+  margin: 1.25rem 0 0.4rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+}

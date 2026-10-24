@@ -6,72 +6,42 @@
 export type ScoreKey =
   | "startSpeed"
   | "lowTime"
-  | "moneyPerHour"
-  | "impact"
-  | "contentEase"
-  | "contentCost"
-  | "certainty"
-  | "reach";
+  | "money"
+  | "content"
+  | "impact";
 
-/** Alle point er 1–10, og højere er altid bedre. Total = sum af point × vægt. */
-export const SCORE_MAX_POINTS = 10;
-
-/** Hurtig opstart ≤ dette tal sender idéen på venteliste uanset total. */
-export const WAITLIST_START_THRESHOLD = 3;
+/** Alle point er 1–5, og højere er altid bedre. */
+export const SCORE_MAX_POINTS = 5;
 
 export const SCORE_CRITERIA: {
   key: ScoreKey;
   label: string;
   hint: string;
-  weight: number;
 }[] = [
   {
     key: "startSpeed",
-    label: "Hurtig opstart",
-    hint: "10 = under 1 uge · 7 = 2–4 uger · 4 = 1–3 mdr. · 1 = over 6 mdr.",
-    weight: 3,
+    label: "Hurtigt i gang",
+    hint: "5 = kan starte i dag/denne uge",
   },
   {
     key: "lowTime",
-    label: "Lavt tidsforbrug",
-    hint: "Timer pr. uge når det kører. 10 = under 2 t · 7 = ca. 5 t · 4 = ca. 10 t · 1 = fuldtid",
-    weight: 3,
+    label: "Lidt tid pr. uge",
+    hint: "5 = kræver meget få timer",
   },
   {
-    key: "moneyPerHour",
-    label: "Penge pr. time",
-    hint: "Hvor meget tjener vi i forhold til de timer, vi lægger i det?",
-    weight: 2,
+    key: "money",
+    label: "Penge",
+    hint: "5 = god indtjening for tiden",
+  },
+  {
+    key: "content",
+    label: "Nem + billig content",
+    hint: "5 = let og næsten gratis at lave",
   },
   {
     key: "impact",
-    label: "Impact",
-    hint: "Hvor stort er brugerens problem, og hvor godt løser vi det?",
-    weight: 2,
-  },
-  {
-    key: "contentEase",
-    label: "Nemt at lave content",
-    hint: "Content er afgørende for markedsføring. 10 = kan laves hurtigt uden særlig kunnen · 1 = tungt, specialiseret eller meget tidskrævende.",
-    weight: 2,
-  },
-  {
-    key: "contentCost",
-    label: "Billigt at lave content",
-    hint: "10 = næsten gratis · 7 = lidt til værktøjer · 4 = betydelig pris pr. måned · 1 = dyrt (modeller, shoots, ads, freelancere).",
-    weight: 2,
-  },
-  {
-    key: "certainty",
-    label: "Sikkerhed",
-    hint: "Hvor sikre er vi på, at det virker?",
-    weight: 1,
-  },
-  {
-    key: "reach",
-    label: "Reach",
-    hint: "Hvor mange kan vi nå?",
-    weight: 1,
+    label: "Gør en forskel",
+    hint: "5 = løser et stort problem",
   },
 ];
 
@@ -306,27 +276,18 @@ export function emptyScores(): Record<string, Record<ScoreKey, number>> {
     out[c.id] = {
       startSpeed: 0,
       lowTime: 0,
-      moneyPerHour: 0,
+      money: 0,
+      content: 0,
       impact: 0,
-      contentEase: 0,
-      contentCost: 0,
-      certainty: 0,
-      reach: 0,
     };
   }
   return out;
 }
 
 export function totalFor(scores: Record<ScoreKey, number>): number {
-  return SCORE_CRITERIA.reduce((sum, c) => sum + (scores[c.key] || 0) * c.weight, 0);
+  return SCORE_CRITERIA.reduce((sum, c) => sum + (scores[c.key] || 0), 0);
 }
 
 export function maxTotal(): number {
-  return SCORE_CRITERIA.reduce((sum, c) => sum + SCORE_MAX_POINTS * c.weight, 0);
-}
-
-/** Venteliste: Hurtig opstart er scoret og ligger på 3 eller under. */
-export function isWaitlisted(scores: Record<ScoreKey, number>): boolean {
-  const v = scores.startSpeed || 0;
-  return v > 0 && v <= WAITLIST_START_THRESHOLD;
+  return SCORE_CRITERIA.length * SCORE_MAX_POINTS;
 }

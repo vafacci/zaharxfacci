@@ -6,18 +6,19 @@ import {
   PARTNERSHIP,
   SCORE_CRITERIA,
   SCORE_MAX_POINTS,
-  WAITLIST_START_THRESHOLD,
   emptyScores,
-  isWaitlisted,
   maxTotal,
   totalFor,
   type ScoreKey,
 } from "@/data/partner-briefing";
 
-const STORAGE_KEY = "facci-partner-scores-v2";
+const STORAGE_KEY = "facci-partner-scores-v3";
+const NOTES_KEY = "facci-partner-notes-v1";
 const SCORE_VALUES = Array.from({ length: SCORE_MAX_POINTS }, (_, i) => i + 1);
 
 type ScoreMap = Record<string, Record<ScoreKey, number>>;
+/** Noter pr. idé (id) + "_general" til fælles noter. */
+type NotesMap = Record<string, string>;
 
 function statusClass(status: string): string {
   switch (status) {
@@ -62,8 +63,10 @@ function pejlingLabel(p?: string): string | null {
 
 export function PartnerBriefingView() {
   const [scores, setScores] = useState<ScoreMap>(emptyScores);
+  const [notes, setNotes] = useState<NotesMap>({});
   const [hydrated, setHydrated] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [resultCopied, setResultCopied] = useState(false);
 
   useEffect(() => {
     try {
@@ -72,6 +75,8 @@ export function PartnerBriefingView() {
         const parsed = JSON.parse(raw) as ScoreMap;
         setScores({ ...emptyScores(), ...parsed });
       }
+      const rawNotes = localStorage.getItem(NOTES_KEY);
+      if (rawNotes) setNotes(JSON.parse(rawNotes) as NotesMap);
     } catch {
       /* ignore corrupt storage */
     }
@@ -83,6 +88,11 @@ export function PartnerBriefingView() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(scores));
   }, [scores, hydrated]);
 
+  useEffect(() => {
+    if (!hydrated) return;
+    localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+  }, [notes, hydrated]);
+
   const ranking = useMemo(() => {
     return CONCEPTS.map((c) => {
       const s = scores[c.id] ?? emptyScores()[c.id];
@@ -90,16 +100,9 @@ export function PartnerBriefingView() {
         id: c.id,
         name: c.name,
         total: totalFor(s),
-        startSpeed: s.startSpeed || 0,
-        waitlisted: isWaitlisted(s),
         filled: SCORE_CRITERIA.every((k) => (s[k.key] ?? 0) > 0),
       };
-    }).sort((a, b) => {
-      // Venteliste nederst, derefter total, og ved lige total vinder højest "Hurtig opstart"
-      if (a.waitlisted !== b.waitlisted) return a.waitlisted ? 1 : -1;
-      if (b.total !== a.total) return b.total - a.total;
-      return b.startSpeed - a.startSpeed;
-    });
+    }).sort((a, b) => b.total - a.total);
   }, [scores]);
 
   const anyScored = ranking.some((r) => r.total > 0);
@@ -115,6 +118,26 @@ export function PartnerBriefingView() {
   function resetScores() {
     setScores(emptyScores());
     localStorage.removeItem(STORAGE_KEY);
+  }
+
+  function setNote(id: string, value: string) {
+    setNotes((prev) => ({ ...prev, [id]: value }));
+  }
+
+  async function copyResult() {
+    const lines = ranking.map(
+      (r, i) =>
+        `${i + 1}. ${r.name} — ${r.total}/${ceiling}${notes[r.id]?.trim() ? ` — ${notes[r.id].trim()}` : ""}`,
+    );
+    const general = notes._general?.trim();
+    const text = `${lines.join("\n")}${general ? `\n\nNoter:\n${general}` : ""}`;
+    try {
+      await navigator.clipboard.writeText(text);
+      setResultCopied(true);
+      window.setTimeout(() => setResultCopied(false), 2000);
+    } catch {
+      setResultCopied(false);
+    }
   }
 
   async function copyLink() {
@@ -235,34 +258,21 @@ export function PartnerBriefingView() {
       <section className="partner-section" aria-labelledby="score-heading">
         <div className="partner-section-head">
           <h2 id="score-heading" className="partner-h2">
-            Giv dem point (1–{SCORE_MAX_POINTS})
+            Giv dem point
           </h2>
           <button type="button" className="partner-btn ghost" onClick={resetScores}>
             Start forfra
           </button>
         </div>
         <p className="partner-hint">
-          Gør det sammen på mødet — tallene huskes i denne browser. Højere er altid bedre
-          (også på tid: få timer og hurtig start giver høje point). Total = point × vægt,
-          max pr. idé: {ceiling}.
+          1 = dårligt, {SCORE_MAX_POINTS} = godt. Højere er altid bedre. Max pr. idé: {ceiling}.
         </p>
-        <ul className="partner-hint partner-rules">
-          <li>
-            Scor først hver for sig, tag gennemsnittet, og tal kun om de punkter, hvor I er mere
-            end 3 point fra hinanden.
-          </li>
-          <li>
-            Får en idé {WAITLIST_START_THRESHOLD} eller under på <strong>Hurtig opstart</strong>,
-            kommer den på venteliste — uanset total.
-          </li>
-          <li>Ved lige total vinder den idé, der har højest Hurtig opstart.</li>
-        </ul>
 
         <div className="partner-score-scroll">
           <table className="partner-score-table">
             <thead>
               <tr>
-                <th scope="col">Kriterium</th>
+                <th scope="col">&nbsp;</th>
                 {CONCEPTS.map((c) => (
                   <th key={c.id} scope="col">
                     {c.name}
@@ -274,9 +284,7 @@ export function PartnerBriefingView() {
               {SCORE_CRITERIA.map((crit) => (
                 <tr key={crit.key}>
                   <th scope="row">
-                    <span className="partner-crit-label">
-                      {crit.label} <span className="partner-crit-weight">×{crit.weight}</span>
-                    </span>
+                    <span className="partner-crit-label">{crit.label}</span>
                     <span className="partner-crit-hint">{crit.hint}</span>
                   </th>
                   {CONCEPTS.map((c) => {
@@ -312,15 +320,39 @@ export function PartnerBriefingView() {
                   </td>
                 ))}
               </tr>
+              <tr>
+                <th scope="row">
+                  <span className="partner-crit-label">Noter</span>
+                </th>
+                {CONCEPTS.map((c) => (
+                  <td key={c.id}>
+                    <textarea
+                      className="partner-note"
+                      rows={3}
+                      value={notes[c.id] ?? ""}
+                      onChange={(e) => setNote(c.id, e.target.value)}
+                      placeholder="Skriv her…"
+                      aria-label={`Noter til ${c.name}`}
+                    />
+                  </td>
+                ))}
+              </tr>
             </tbody>
           </table>
         </div>
       </section>
 
       <section className="partner-section" aria-labelledby="rank-heading">
-        <h2 id="rank-heading" className="partner-h2">
-          Lige nu ligger de her
-        </h2>
+        <div className="partner-section-head">
+          <h2 id="rank-heading" className="partner-h2">
+            Lige nu ligger de her
+          </h2>
+          {anyScored ? (
+            <button type="button" className="partner-btn ghost" onClick={copyResult}>
+              {resultCopied ? "Kopieret" : "Kopiér resultat"}
+            </button>
+          ) : null}
+        </div>
         {!anyScored ? (
           <p className="partner-hint">Giv bare et par point — så dukker rækkefølgen op her.</p>
         ) : (
@@ -332,9 +364,7 @@ export function PartnerBriefingView() {
                   <span className="partner-rank-name">{r.name}</span>
                   <span className="partner-rank-score">
                     {r.total}/{ceiling}
-                    {r.waitlisted ? (
-                      <span className="partner-rank-partial"> venteliste</span>
-                    ) : !r.filled && r.total > 0 ? (
+                    {!r.filled && r.total > 0 ? (
                       <span className="partner-rank-partial"> delvis</span>
                     ) : null}
                   </span>
@@ -343,9 +373,20 @@ export function PartnerBriefingView() {
             ))}
           </ol>
         )}
-        <p className="partner-callout soft">
-          Tip: vælg <strong>én I starter med</strong> og <strong>én som nr. 2</strong> — brug både
-          pointene og jeres mavefornemmelse.
+
+        <label className="partner-note-label" htmlFor="partner-general-notes">
+          Fælles noter
+        </label>
+        <textarea
+          id="partner-general-notes"
+          className="partner-note wide"
+          rows={5}
+          value={notes._general ?? ""}
+          onChange={(e) => setNote("_general", e.target.value)}
+          placeholder="Beslutninger, næste skridt, tanker fra mødet…"
+        />
+        <p className="partner-hint">
+          Point og noter gemmes kun i denne browser. Brug “Kopiér resultat”, hvis I vil dele dem.
         </p>
       </section>
 
