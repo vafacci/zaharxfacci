@@ -4,41 +4,60 @@
  */
 
 export type ScoreKey =
-  | "story"
-  | "contentCore"
-  | "materials"
-  | "feedback"
-  | "roleFit";
+  | "startSpeed"
+  | "lowTime"
+  | "moneyPerHour"
+  | "impact"
+  | "certainty"
+  | "reach";
+
+/** Alle point er 1–10, og højere er altid bedre. Total = sum af point × vægt. */
+export const SCORE_MAX_POINTS = 10;
+
+/** Hurtig opstart ≤ dette tal sender idéen på venteliste uanset total. */
+export const WAITLIST_START_THRESHOLD = 3;
 
 export const SCORE_CRITERIA: {
   key: ScoreKey;
   label: string;
   hint: string;
+  weight: number;
 }[] = [
   {
-    key: "story",
-    label: "Nem at forklare",
-    hint: "Kan I sige det på ca. 10 sekunder?",
+    key: "startSpeed",
+    label: "Hurtig opstart",
+    hint: "10 = under 1 uge · 7 = 2–4 uger · 4 = 1–3 mdr. · 1 = over 6 mdr.",
+    weight: 3,
   },
   {
-    key: "contentCore",
-    label: "Content er centralt",
-    hint: "Er indhold selve grejet — eller bare marketing omkring noget andet?",
+    key: "lowTime",
+    label: "Lavt tidsforbrug",
+    hint: "Timer pr. uge når det kører. 10 = under 2 t · 7 = ca. 5 t · 4 = ca. 10 t · 1 = fuldtid",
+    weight: 3,
   },
   {
-    key: "materials",
-    label: "Klar til at lave ting",
-    hint: "Er der brand, stemme og eksempler at bygge på?",
+    key: "moneyPerHour",
+    label: "Penge pr. time",
+    hint: "Hvor meget tjener vi i forhold til de timer, vi lægger i det?",
+    weight: 2,
   },
   {
-    key: "feedback",
-    label: "Hurtigt at mærke effekt",
-    hint: "Kan I se noget på 2–4 uger?",
+    key: "impact",
+    label: "Impact",
+    hint: "Hvor stort er brugerens problem, og hvor godt løser vi det?",
+    weight: 2,
   },
   {
-    key: "roleFit",
-    label: "Passer til os to",
-    hint: "Passer det godt til tech + content lige nu?",
+    key: "certainty",
+    label: "Sikkerhed",
+    hint: "Hvor sikre er vi på, at det virker?",
+    weight: 1,
+  },
+  {
+    key: "reach",
+    label: "Reach",
+    hint: "Hvor mange kan vi nå?",
+    weight: 1,
   },
 ];
 
@@ -271,20 +290,27 @@ export function emptyScores(): Record<string, Record<ScoreKey, number>> {
   const out: Record<string, Record<ScoreKey, number>> = {};
   for (const c of CONCEPTS) {
     out[c.id] = {
-      story: 0,
-      contentCore: 0,
-      materials: 0,
-      feedback: 0,
-      roleFit: 0,
+      startSpeed: 0,
+      lowTime: 0,
+      moneyPerHour: 0,
+      impact: 0,
+      certainty: 0,
+      reach: 0,
     };
   }
   return out;
 }
 
 export function totalFor(scores: Record<ScoreKey, number>): number {
-  return SCORE_CRITERIA.reduce((sum, c) => sum + (scores[c.key] || 0), 0);
+  return SCORE_CRITERIA.reduce((sum, c) => sum + (scores[c.key] || 0) * c.weight, 0);
 }
 
 export function maxTotal(): number {
-  return SCORE_CRITERIA.length * 5;
+  return SCORE_CRITERIA.reduce((sum, c) => sum + SCORE_MAX_POINTS * c.weight, 0);
+}
+
+/** Venteliste: Hurtig opstart er scoret og ligger på 3 eller under. */
+export function isWaitlisted(scores: Record<ScoreKey, number>): boolean {
+  const v = scores.startSpeed || 0;
+  return v > 0 && v <= WAITLIST_START_THRESHOLD;
 }

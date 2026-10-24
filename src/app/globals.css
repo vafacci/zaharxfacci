@@ -1550,13 +1550,27 @@ select {
 }
 
 .partner-score-btns {
-  display: inline-flex;
-  gap: 0.28rem;
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  gap: 0.22rem;
+  justify-content: center;
+}
+
+.partner-crit-weight {
+  margin-left: 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--p-accent);
+}
+
+.partner-rules {
+  margin: -0.4rem 0 1.1rem;
+  padding-left: 1.2rem;
 }
 
 .partner-score-btn {
-  width: 2rem;
-  height: 2rem;
+  width: 1.7rem;
+  height: 1.7rem;
   padding: 0;
   border-radius: 999px;
   border: 1px solid var(--p-line);

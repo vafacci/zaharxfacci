@@ -5,13 +5,17 @@ import {
   CONCEPTS,
   PARTNERSHIP,
   SCORE_CRITERIA,
+  SCORE_MAX_POINTS,
+  WAITLIST_START_THRESHOLD,
   emptyScores,
+  isWaitlisted,
   maxTotal,
   totalFor,
   type ScoreKey,
 } from "@/data/partner-briefing";
 
-const STORAGE_KEY = "facci-partner-scores-v1";
+const STORAGE_KEY = "facci-partner-scores-v2";
+const SCORE_VALUES = Array.from({ length: SCORE_MAX_POINTS }, (_, i) => i + 1);
 
 type ScoreMap = Record<string, Record<ScoreKey, number>>;
 
@@ -80,12 +84,22 @@ export function PartnerBriefingView() {
   }, [scores, hydrated]);
 
   const ranking = useMemo(() => {
-    return CONCEPTS.map((c) => ({
-      id: c.id,
-      name: c.name,
-      total: totalFor(scores[c.id] ?? emptyScores()[c.id]),
-      filled: SCORE_CRITERIA.every((k) => (scores[c.id]?.[k.key] ?? 0) > 0),
-    })).sort((a, b) => b.total - a.total);
+    return CONCEPTS.map((c) => {
+      const s = scores[c.id] ?? emptyScores()[c.id];
+      return {
+        id: c.id,
+        name: c.name,
+        total: totalFor(s),
+        startSpeed: s.startSpeed || 0,
+        waitlisted: isWaitlisted(s),
+        filled: SCORE_CRITERIA.every((k) => (s[k.key] ?? 0) > 0),
+      };
+    }).sort((a, b) => {
+      // Venteliste nederst, derefter total, og ved lige total vinder højest "Hurtig opstart"
+      if (a.waitlisted !== b.waitlisted) return a.waitlisted ? 1 : -1;
+      if (b.total !== a.total) return b.total - a.total;
+      return b.startSpeed - a.startSpeed;
+    });
   }, [scores]);
 
   const anyScored = ranking.some((r) => r.total > 0);
@@ -221,16 +235,28 @@ export function PartnerBriefingView() {
       <section className="partner-section" aria-labelledby="score-heading">
         <div className="partner-section-head">
           <h2 id="score-heading" className="partner-h2">
-            Giv dem point (1–5)
+            Giv dem point (1–{SCORE_MAX_POINTS})
           </h2>
           <button type="button" className="partner-btn ghost" onClick={resetScores}>
             Start forfra
           </button>
         </div>
         <p className="partner-hint">
-          Gør det sammen på mødet — tallene huskes i denne browser. Max pr. idé:{" "}
-          {ceiling}.
+          Gør det sammen på mødet — tallene huskes i denne browser. Højere er altid bedre
+          (også på tid: få timer og hurtig start giver høje point). Total = point × vægt,
+          max pr. idé: {ceiling}.
         </p>
+        <ul className="partner-hint partner-rules">
+          <li>
+            Scor først hver for sig, tag gennemsnittet, og tal kun om de punkter, hvor I er mere
+            end 3 point fra hinanden.
+          </li>
+          <li>
+            Får en idé {WAITLIST_START_THRESHOLD} eller under på <strong>Hurtig opstart</strong>,
+            kommer den på venteliste — uanset total.
+          </li>
+          <li>Ved lige total vinder den idé, der har højest Hurtig opstart.</li>
+        </ul>
 
         <div className="partner-score-scroll">
           <table className="partner-score-table">
@@ -248,7 +274,9 @@ export function PartnerBriefingView() {
               {SCORE_CRITERIA.map((crit) => (
                 <tr key={crit.key}>
                   <th scope="row">
-                    <span className="partner-crit-label">{crit.label}</span>
+                    <span className="partner-crit-label">
+                      {crit.label} <span className="partner-crit-weight">×{crit.weight}</span>
+                    </span>
                     <span className="partner-crit-hint">{crit.hint}</span>
                   </th>
                   {CONCEPTS.map((c) => {
@@ -256,7 +284,7 @@ export function PartnerBriefingView() {
                     return (
                       <td key={c.id}>
                         <div className="partner-score-btns" role="group" aria-label={`${c.name}: ${crit.label}`}>
-                          {[1, 2, 3, 4, 5].map((n) => (
+                          {SCORE_VALUES.map((n) => (
                             <button
                               key={n}
                               type="button"
@@ -304,7 +332,9 @@ export function PartnerBriefingView() {
                   <span className="partner-rank-name">{r.name}</span>
                   <span className="partner-rank-score">
                     {r.total}/{ceiling}
-                    {!r.filled && r.total > 0 ? (
+                    {r.waitlisted ? (
+                      <span className="partner-rank-partial"> venteliste</span>
+                    ) : !r.filled && r.total > 0 ? (
                       <span className="partner-rank-partial"> delvis</span>
                     ) : null}
                   </span>
