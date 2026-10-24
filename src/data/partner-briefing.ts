@@ -8,6 +8,8 @@ export type ScoreKey =
   | "lowTime"
   | "moneyPerHour"
   | "impact"
+  | "contentEase"
+  | "contentCost"
   | "certainty"
   | "reach";
 
@@ -45,6 +47,18 @@ export const SCORE_CRITERIA: {
     key: "impact",
     label: "Impact",
     hint: "Hvor stort er brugerens problem, og hvor godt løser vi det?",
+    weight: 2,
+  },
+  {
+    key: "contentEase",
+    label: "Nemt at lave content",
+    hint: "Content er afgørende for markedsføring. 10 = kan laves hurtigt uden særlig kunnen · 1 = tungt, specialiseret eller meget tidskrævende.",
+    weight: 2,
+  },
+  {
+    key: "contentCost",
+    label: "Billigt at lave content",
+    hint: "10 = næsten gratis · 7 = lidt til værktøjer · 4 = betydelig pris pr. måned · 1 = dyrt (modeller, shoots, ads, freelancere).",
     weight: 2,
   },
   {
@@ -294,6 +308,8 @@ export function emptyScores(): Record<string, Record<ScoreKey, number>> {
       lowTime: 0,
       moneyPerHour: 0,
       impact: 0,
+      contentEase: 0,
+      contentCost: 0,
       certainty: 0,
       reach: 0,
     };
