@@ -2335,3 +2335,63 @@ select {
     gap: 1.5rem;
   }
 }
+/* Gemt resultat */
+.res-shared {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--p-dim);
+}
+
+.res-rows {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.res-rows li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-top: 1px solid var(--p-line);
+  font-size: 0.95rem;
+  font-weight: 550;
+}
+
+.res-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+}
+
+.res-dots i {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  background: var(--p-bg-soft);
+}
+
+.res-dots i.on {
+  background: var(--p-accent);
+}
+
+.res-dots b {
+  min-width: 1.2rem;
+  margin-left: 0.4rem;
+  text-align: right;
+  color: var(--p-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.res-notes {
+  margin: 0.3rem 0 0;
+  padding: 0.8rem 0.9rem;
+  border-radius: 12px;
+  background: var(--p-bg);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--p-ink);
+  white-space: pre-wrap;
+}

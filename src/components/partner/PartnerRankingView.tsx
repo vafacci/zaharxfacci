@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import {
   CONCEPTS,
@@ -140,6 +141,9 @@ export function PartnerRankingView() {
           </p>
         </div>
         <div className="pr-head-actions">
+          <Link href="/partner/resultat" className="partner-btn ghost">
+            Se gemt resultat
+          </Link>
           <button type="button" className="partner-btn solid" onClick={copyResult} disabled={!anyScored}>
             {copied ? "Kopieret" : "Kopiér resultat"}
           </button>
