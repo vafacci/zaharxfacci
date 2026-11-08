@@ -48,9 +48,9 @@
 - **One-liner:** Ét simpelt sted til studiegrupper: chat, medlemmer, projektinfo, deadline og links.
 - **Problem:** Studiegrupper spredes over private chats; akavet at forbinde via private profiler.
 - **Løsning:** Samarbejdsrum der *supplerer* eksisterende værktøjer — ikke endnu et socialt netværk.
-- **Status:** Undervejs — app + brand pack. StudieChat = historisk arbejdsnavn.
+- **Status:** **Primær prioritet** (rangering) — app + brand pack. StudieChat = historisk arbejdsnavn. Alignment: `workspaces/grupvi/product/alignment-2026-10-29.md`. Agenda: `sunday-agenda.md`.
 - **Content-vinkel:** Middel. Bedst når produktet kan demonstreres.
-- **Pejling:** Parkér
+- **Pejling:** Primær — gratis app først; monetisering senere
 
 ### DailyCap
 - **Link:** [dailycap.vercel.app](https://dailycap.vercel.app/) · [alt](https://dailycap-ouzc.vercel.app/)

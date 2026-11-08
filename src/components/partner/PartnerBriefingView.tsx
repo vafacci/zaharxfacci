@@ -161,6 +161,22 @@ export function PartnerBriefingView() {
         </div>
       </section>
 
+      <section className="partner-section" aria-labelledby="grupvi-cta-heading">
+        <div className="partner-cta">
+          <div>
+            <h2 id="grupvi-cta-heading" className="partner-h2">
+              Grupvi er i gang
+            </h2>
+            <p className="partner-hint">
+              Fælles side med mål, opgaver og noter — ved siden af den live app.
+            </p>
+          </div>
+          <Link href="/partner/grupvi" className="partner-btn solid">
+            Åbn Grupvi
+          </Link>
+        </div>
+      </section>
+
       <section className="partner-section" aria-labelledby="cta-heading">
         <div className="partner-cta">
           <div>

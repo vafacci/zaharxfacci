@@ -308,6 +308,15 @@ node workspaces/dailycap/check.js
 - Markdown mirror: `docs/PARTNER_BRIEFING.md` (Notion/paste-friendly).
 - Nav: sidebar **Briefing**. Scanna intentionally blank until filled with partner.
 
+## Grupvi primary focus (2026-10-29)
+
+- Live app + landing already exist (`studiechat.vercel.app`); vault is an **ops HQ**, not a greenfield build
+- HQ rooms: `workspaces/grupvi/{tasks,product,marketing,content,business,meetings,brand}/`
+- Task board + checkpoints: `workspaces/grupvi/tasks/BOARD.md`
+- Partner workspace: `/partner/grupvi` — fokus, milepæle, opgaver, ressourcer (links/docs), fælles noter (partner_kv)
+- Alignment / how-we-work: `product/alignment-2026-10-29.md`, `product/operating-overview.md`
+- `docs/PARTNER_BRIEFING.md` pejling for Grupvi → **Primær**
+
 ## Next
 
-Optional: connect DailyCap Desktop/repo allowlist when path exists. Owner can refine packs anytime. Weekly loops for NOFACCI/DailyCap only if owner wants them. Host `/partner` publicly (tunnel/static) if the partner needs a remote URL.
+Use `/grupvi` HQ daily. Polish/redesign live app; drive todos from board. Content + marketing rooms for assets/messaging. Business monetization parked (free first).

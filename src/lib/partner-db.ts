@@ -128,3 +128,79 @@ export async function restoreVersion(id: number): Promise<PartnerVersion | null>
   await saveItems(items);
   return version;
 }
+
+const GRUPVI_HQ_KEY = "grupvi:hq";
+
+export type GrupviHqState = {
+  copyVersion?: number;
+  focus: string;
+  notes: string;
+  checkpoints: { id: string; label: string; done: boolean }[];
+  todos: {
+    id: string;
+    task: string;
+    room: string;
+    owner: string;
+    deadline: string;
+    status: string;
+  }[];
+  done: { id: string; task: string; date: string }[];
+  resources?: {
+    id: string;
+    title: string;
+    url: string;
+    note?: string;
+  }[];
+};
+
+export async function loadGrupviHqState(): Promise<GrupviHqState | null> {
+  const rows = (await sql()`
+    SELECT value FROM partner_kv WHERE key = ${GRUPVI_HQ_KEY} LIMIT 1
+  `) as { value: string }[];
+  if (!rows[0]?.value) return null;
+  try {
+    const parsed = JSON.parse(rows[0].value) as GrupviHqState;
+    if (!parsed || !Array.isArray(parsed.checkpoints) || !Array.isArray(parsed.todos)) {
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+export async function saveGrupviHqState(state: GrupviHqState): Promise<void> {
+  const value = JSON.stringify(state);
+  await sql()`
+    INSERT INTO partner_kv (key, value)
+    VALUES (${GRUPVI_HQ_KEY}, ${value})
+    ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()
+  `;
+}
+
+const GRUPVI_FILES_KEY = "grupvi:files";
+
+export async function loadGrupviFiles(): Promise<Record<string, string>> {
+  const rows = (await sql()`
+    SELECT value FROM partner_kv WHERE key = ${GRUPVI_FILES_KEY} LIMIT 1
+  `) as { value: string }[];
+  if (!rows[0]?.value) return {};
+  try {
+    const parsed = JSON.parse(rows[0].value) as Record<string, string>;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+    return parsed;
+  } catch {
+    return {};
+  }
+}
+
+export async function saveGrupviFile(relPath: string, content: string): Promise<void> {
+  const files = await loadGrupviFiles();
+  files[relPath] = content;
+  const value = JSON.stringify(files);
+  await sql()`
+    INSERT INTO partner_kv (key, value)
+    VALUES (${GRUPVI_FILES_KEY}, ${value})
+    ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()
+  `;
+}
