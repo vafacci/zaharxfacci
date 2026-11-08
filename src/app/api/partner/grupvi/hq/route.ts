@@ -11,6 +11,7 @@ import {
   setCheckpoint,
   setFocus,
   setNotes,
+  setResourceTitle,
   setTodoOwner,
 } from "@/lib/grupvi-hq";
 
@@ -102,6 +103,15 @@ export async function PATCH(request: NextRequest) {
     }
     if (op === "resource_delete" && typeof body?.id === "string") {
       const resources = await deleteResource(body.id);
+      return NextResponse.json({ ok: true, resources }, { headers: noStore });
+    }
+    if (
+      op === "resource_title" &&
+      typeof body?.id === "string" &&
+      typeof body?.title === "string" &&
+      body.title.trim()
+    ) {
+      const resources = await setResourceTitle(body.id, body.title);
       return NextResponse.json({ ok: true, resources }, { headers: noStore });
     }
 

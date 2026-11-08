@@ -38,6 +38,7 @@ export function PartnerGrupviView() {
   const [newResourceTitle, setNewResourceTitle] = useState("");
   const [newResourceUrl, setNewResourceUrl] = useState("");
   const [newResourceNote, setNewResourceNote] = useState("");
+  const [titleDrafts, setTitleDrafts] = useState<Record<string, string>>({});
   const [showDone, setShowDone] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -298,16 +299,54 @@ export function PartnerGrupviView() {
               ) : (
                 (ws.resources ?? []).map((r) => (
                   <li key={r.id} className="gws-resource">
-                    <a
-                      className="gws-resource-link"
-                      href={r.url}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <strong>{r.title}</strong>
-                      {r.note ? <span>{r.note}</span> : null}
-                      <em>{r.url.replace(/^https?:\/\//i, "")}</em>
-                    </a>
+                    <div className="gws-resource-main">
+                      <input
+                        className="gws-resource-title"
+                        value={titleDrafts[r.id] ?? r.title}
+                        disabled={busy}
+                        aria-label="Ressource-titel"
+                        onChange={(e) =>
+                          setTitleDrafts((d) => ({ ...d, [r.id]: e.target.value }))
+                        }
+                        onBlur={() => {
+                          const next = (titleDrafts[r.id] ?? r.title).trim();
+                          if (!next) {
+                            setTitleDrafts((d) => {
+                              const copy = { ...d };
+                              delete copy[r.id];
+                              return copy;
+                            });
+                            return;
+                          }
+                          if (next === r.title) return;
+                          void patch(
+                            { op: "resource_title", id: r.id, title: next },
+                            { silent: true },
+                          ).then(() => {
+                            setTitleDrafts((d) => {
+                              const copy = { ...d };
+                              delete copy[r.id];
+                              return copy;
+                            });
+                          });
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            (e.target as HTMLInputElement).blur();
+                          }
+                        }}
+                      />
+                      {r.note ? <span className="gws-resource-note">{r.note}</span> : null}
+                      <a
+                        className="gws-resource-url"
+                        href={r.url}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {r.url.replace(/^https?:\/\//i, "")}
+                      </a>
+                    </div>
                     <button
                       type="button"
                       className="gws-task-del"

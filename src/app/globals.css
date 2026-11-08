@@ -3167,31 +3167,49 @@ select {
 .gws-resource:last-child {
   border-bottom: none;
 }
-.gws-resource-link {
+.gws-resource-main {
   display: grid;
   gap: 0.15rem;
-  text-decoration: none;
-  color: inherit;
   min-width: 0;
 }
-.gws-resource-link strong {
+.gws-resource-title {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: calc(var(--p-radius) - 2px);
+  background: transparent;
+  color: var(--p-ink);
+  font: inherit;
   font-size: 0.98rem;
   font-weight: 600;
-  color: var(--p-ink);
+  line-height: 1.35;
+  padding: 0.15rem 0.35rem;
+  margin: -0.15rem -0.35rem 0;
 }
-.gws-resource-link span {
+.gws-resource-title:hover {
+  border-color: var(--p-line);
+  background: #fff;
+}
+.gws-resource-title:focus {
+  outline: none;
+  border-color: var(--p-ink);
+  background: #fff;
+}
+.gws-resource-note {
   font-size: 0.86rem;
   color: var(--p-muted);
+  padding: 0 0.35rem;
 }
-.gws-resource-link em {
-  font-style: normal;
+.gws-resource-url {
   font-size: 0.78rem;
   color: var(--p-dim);
+  text-decoration: none;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  padding: 0 0.35rem;
 }
-.gws-resource-link:hover strong {
+.gws-resource-url:hover {
+  color: var(--p-ink);
   text-decoration: underline;
   text-underline-offset: 2px;
 }

@@ -473,3 +473,16 @@ export async function deleteResource(id: string): Promise<Resource[]> {
   await persist(board);
   return board.resources;
 }
+
+export async function setResourceTitle(id: string, title: string): Promise<Resource[]> {
+  const next = title.trim().slice(0, 200);
+  if (!next) throw new Error("Titel mangler");
+  const board = await currentWorkspace();
+  const found = board.resources.some((r) => r.id === id);
+  if (!found) throw new Error("Ressourcen findes ikke");
+  board.resources = board.resources.map((r) =>
+    r.id === id ? { ...r, title: next } : r,
+  );
+  await persist(board);
+  return board.resources;
+}
