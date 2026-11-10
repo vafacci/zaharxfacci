@@ -144,7 +144,7 @@ export type GrupviHqState = {
     deadline: string;
     status: string;
   }[];
-  done: { id: string; task: string; date: string }[];
+  done: { id: string; task: string; date: string; owner?: string }[];
   resources?: {
     id: string;
     title: string;

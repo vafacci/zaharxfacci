@@ -24,6 +24,7 @@ export type BoardDone = {
   id: string;
   task: string;
   date: string;
+  owner?: string;
 };
 
 export type Resource = {
@@ -217,7 +218,7 @@ function migrateBoard(stored: GrupviHqState): Board {
 
   const done = (stored.done ?? [])
     .filter((d) => d.task && !isMetaDone(d.task))
-    .map((d) => ({ id: d.id, task: d.task, date: d.date }));
+    .map((d) => ({ id: d.id, task: d.task, date: d.date, owner: d.owner ?? "" }));
 
   const focus =
     typeof stored.focus === "string" && stored.focus.trim() && !/polish først|penge senere/i.test(stored.focus)
@@ -299,7 +300,7 @@ async function currentWorkspace(): Promise<Board> {
       })),
     done: (stored.done ?? [])
       .filter((d) => d.task && !isMetaDone(d.task))
-      .map((d) => ({ id: d.id, task: d.task, date: d.date })),
+      .map((d) => ({ id: d.id, task: d.task, date: d.date, owner: d.owner ?? "" })),
     resources: resources ?? STARTER_RESOURCES,
   };
 
@@ -328,9 +329,9 @@ async function persist(board: Board): Promise<void> {
       "",
       "## Færdig",
       "",
-      "| ID | Opgave | Dato |",
-      "| --- | --- | --- |",
-      ...board.done.map((d) => `| ${d.id} | ${d.task} | ${d.date} |`),
+      "| ID | Opgave | Ejer | Dato |",
+      "| --- | --- | --- | --- |",
+      ...board.done.map((d) => `| ${d.id} | ${d.task} | ${d.owner ?? ""} | ${d.date} |`),
       "",
     ];
     fs.mkdirSync(path.dirname(boardPath()), { recursive: true });
@@ -414,7 +415,7 @@ export async function completeTodo(
   const today = new Date().toISOString().slice(0, 10);
   board.todos = board.todos.filter((t) => t.id !== id);
   board.done = [
-    { id: target.id, task: target.task, date: today },
+    { id: target.id, task: target.task, date: today, owner: target.owner },
     ...board.done.filter((d) => d.id !== id),
   ];
   await persist(board);
@@ -428,7 +429,7 @@ export async function reopenTodo(id: string): Promise<{ todos: BoardTodo[]; done
   board.done = board.done.filter((d) => d.id !== id);
   board.todos = [
     ...board.todos,
-    { id: target.id, task: target.task, owner: "", status: "todo" },
+    { id: target.id, task: target.task, owner: target.owner ?? "", status: "todo" },
   ];
   await persist(board);
   return { todos: board.todos, done: board.done };
